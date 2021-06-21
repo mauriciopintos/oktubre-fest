@@ -1,0 +1,148 @@
+import marcas.*
+import jarras.*
+import personas.*
+import carpas.*
+
+
+describe "Requerimientos - segunda parte" {
+	
+	const hofbrau = new CervezaRubia(lupulo=7, origen="Alemania", graduacion=4.9)
+	const warsteiner = new CervezaNegra(lupulo=2.3, origen="Alemania")
+	const andes = new CervezaRoja(lupulo=6, origen="Argentina")
+	const trapista = new CervezaRubia(lupulo=6, origen="Belgica", graduacion=4)
+	const leffeBrune = new CervezaNegra(lupulo=7, origen="Belgica")
+	const kasteel = new CervezaRoja(lupulo=6.5, origen="Belgica")
+	
+	const carpaHofbrau = new Carpa(genteAdmitida=2, tieneBanda=true, marca=hofbrau)
+	const carpaWarsteiner = new Carpa(genteAdmitida=2, tieneBanda=true, marca=warsteiner)
+	const carpaAndes = new Carpa(genteAdmitida=2, tieneBanda=false, marca=andes)
+	const carpaTrapista = new Carpa(genteAdmitida=2, tieneBanda=true, marca=trapista)
+	const carpaLeffeBrune = new Carpa(genteAdmitida=2, tieneBanda=false, marca=leffeBrune)
+	const carpaKasteel = new Carpa(genteAdmitida=2, tieneBanda=true, marca=kasteel)	
+	
+	const j1 = new Jarra(capacidad=0.7,marca=hofbrau)
+	const j2 = new Jarra(capacidad=0.7,marca=warsteiner)
+	const j3 = new Jarra(capacidad=1,marca=andes)
+	const j4 = new Jarra(capacidad=1,marca=trapista)
+	const j5 = new Jarra(capacidad=1,marca=leffeBrune)
+	const j6 = new Jarra(capacidad=0.7,marca=leffeBrune)
+	const j7 = new Jarra(capacidad=0.8,marca=kasteel)
+
+	
+	const aleman = new Aleman(peso=83, leGustaMusicaTradicional=true, aguante=20)
+	const belga = new Belga(peso=91, leGustaMusicaTradicional=false, aguante=25)
+	const checo = new Checo(peso=97, leGustaMusicaTradicional=false, aguante=22)
+	
+	const aleman1 = new Aleman(peso=83, leGustaMusicaTradicional=true, aguante=20)
+	const belga1 = new Belga(peso=91, leGustaMusicaTradicional=false, aguante=25)
+	const checo1 = new Checo(peso=97, leGustaMusicaTradicional=false, aguante=22)
+
+	
+	fixture {
+		graduacionReglamentaria.valor(12)
+		
+		aleman.comprarCerveza(j1)
+		aleman.comprarCerveza(j2)
+		aleman.comprarCerveza(j3)
+		
+		belga.comprarCerveza(j4)
+		belga.comprarCerveza(j5)
+		belga.comprarCerveza(j6)
+		
+		checo.comprarCerveza(j3)
+		checo.comprarCerveza(j7)
+	}
+	   
+
+	test "Test 5: si una persona quiere entrar a una carpa" {
+		assert.that(aleman.quiereEntrar(carpaHofbrau)) 
+		assert.that(aleman.quiereEntrar(carpaWarsteiner))
+		assert.that(belga.quiereEntrar(carpaAndes))
+		assert.that(not belga.quiereEntrar(carpaTrapista))
+		assert.that(checo.quiereEntrar(carpaLeffeBrune))
+		assert.that(not checo.quiereEntrar(carpaKasteel))
+	}
+	
+	test "Test 6: si una carpa deja ingresar a una persona" {
+		assert.that(carpaHofbrau.dejaIngresar(aleman)) 
+		assert.that(carpaWarsteiner.dejaIngresar(aleman))
+		assert.that(carpaAndes.dejaIngresar(belga))
+		assert.that(carpaTrapista.dejaIngresar(belga))
+		assert.that(not carpaLeffeBrune.dejaIngresar(checo))
+		assert.that(not carpaKasteel.dejaIngresar(checo))
+	}
+
+	test "Test 7: si una persona puede entrar a una carpa" {
+		assert.that(aleman.puedeEntrar(carpaHofbrau)) 
+		assert.that(aleman.puedeEntrar(carpaWarsteiner))
+		assert.that(belga.puedeEntrar(carpaAndes))
+		assert.that(not belga.puedeEntrar(carpaTrapista))
+		assert.that(not checo.puedeEntrar(carpaLeffeBrune))
+		assert.that(not checo.puedeEntrar(carpaKasteel))
+	}
+	
+	test "Test 8: que una persona efectivamente entre a una carpa" {
+		
+		carpaHofbrau.admitir(new Aleman(peso=83, leGustaMusicaTradicional=true, aguante=20))
+		
+		assert.throwsException{aleman.entrar(carpaHofbrau)} 
+		
+		aleman.entrar(carpaWarsteiner)
+		belga.entrar(carpaAndes)
+		
+		assert.throwsException{checo1.entrar(carpaTrapista)}
+		
+		belga1.entrar(carpaLeffeBrune)
+		
+		assert.throwsException{aleman1.entrar(carpaHofbrau)}
+		assert.throwsException{belga.entrar(carpaTrapista)}
+		assert.throwsException{checo.entrar(carpaLeffeBrune)}
+		assert.throwsException{checo.entrar(carpaKasteel)}
+	}
+	
+	test "Test 9: que una carpa le sirva una jarra de cerveza a una persona" {
+		carpaHofbrau.admitir(aleman)
+		carpaHofbrau.servirCerveza(aleman,1)
+		 
+		assert.throwsException{carpaWarsteiner.servirCerveza(aleman,1.5)}
+		assert.throwsException{carpaAndes.servirCerveza(belga,0.7)}
+		assert.throwsException{carpaTrapista.servirCerveza(belga,0.5)}
+		assert.throwsException{carpaLeffeBrune.servirCerveza(checo,1.7)}
+		assert.throwsException{carpaKasteel.servirCerveza(checo,0.8)}
+	}
+	
+	test "Test 10: cuantos ebrios empedernidos hay dentro de una carpa" {
+		aleman1.comprarCerveza(j3)
+		aleman1.comprarCerveza(j4)
+		aleman1.comprarCerveza(j5)
+		
+		belga1.comprarCerveza(j3)
+		belga1.comprarCerveza(j4)
+		belga1.comprarCerveza(j6)
+		
+		checo1.comprarCerveza(j3)
+		checo1.comprarCerveza(j5)
+		
+		carpaHofbrau.genteDentro().add(aleman1)
+		carpaHofbrau.genteDentro().add(belga1)
+		carpaHofbrau.genteDentro().add(checo1)		
+		assert.equals(2,carpaHofbrau.ebriosEmpedernidos()) 
+
+		carpaWarsteiner.genteDentro().add(checo1)
+		assert.equals(1,carpaWarsteiner.ebriosEmpedernidos())
+		
+		carpaAndes.genteDentro().add(aleman1)
+		assert.equals(1,carpaAndes.ebriosEmpedernidos())
+		
+		carpaTrapista.genteDentro().add(belga1)
+		assert.equals(0,carpaTrapista.ebriosEmpedernidos())
+		assert.equals(0,carpaLeffeBrune.ebriosEmpedernidos())
+		assert.equals(0,carpaKasteel.ebriosEmpedernidos())
+	}
+	
+	test "Test 11: si una persona es patriota" {
+		assert.that(not aleman.esPatriota())
+		assert.that(belga.esPatriota())
+		assert.that(not checo.esPatriota())
+	}
+}
