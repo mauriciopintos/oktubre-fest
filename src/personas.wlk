@@ -20,7 +20,7 @@ class Persona {
 	
 	method quiereEntrar(unaCarpa) = self.leGusta(unaCarpa.marca()) and self.musicaOk(unaCarpa)
 	
-	method musicaOk(unaCarpa) = if (self.leGustaMusicaTradicional()) unaCarpa.tieneBanda() else not unaCarpa.tieneBanda()
+	method musicaOk(unaCarpa) = self.leGustaMusicaTradicional() == unaCarpa.tieneBanda()
 	
 	method puedeEntrar(unaCarpa) = self.quiereEntrar(unaCarpa) and unaCarpa.dejaIngresar(self)
 	
@@ -29,6 +29,18 @@ class Persona {
 	method esEmpedernido() = self.jarrasCompradas().all( { j => j.capacidad() >= 1 } )
 	
 	method esPatriota() = self.jarrasCompradas().all( { j => j.marca().origen() == self.origen() } )
+	
+	method esCompatibleCon(unaPerona) {
+		return unaPerona.marcasQueCompro().intersection(self.marcasQueCompro()).size() >
+				unaPerona.marcasQueCompro().size().min(self.marcasQueCompro().size())
+	}
+	
+	method marcasQueCompro() = self.jarrasCompradas().asSet().map( { j => j.marca() } )
+	
+	method carpasQueLeSirvieron() = self.jarrasCompradas().asSet().map( { j => j.servidaEn() } )
+	
+	method estaEntrandoEnElVicio() = (1..self.jarrasCompradas().size() -1).all( { i => self.jarraEsAlMenosComoAnterior(i)  } )
+	method jarraEsAlMenosComoAnterior(indice) = self.jarrasCompradas().get(indice).capacidad() >= self.jarrasCompradas().get(indice -1).capacidad()
 }
 
 class Belga inherits Persona {

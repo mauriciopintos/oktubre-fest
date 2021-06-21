@@ -1,9 +1,12 @@
 import marcas.*
+import carpas.*
 
 class Jarra {
 	const property capacidad
-	const property marca
+	const property servidaEn
 	
-	method contenidoDeAlcohol() = capacidad * marca.graduacion() * 0.01
+	method marca() = self.servidaEn().marca()
+	
+	method contenidoDeAlcohol() =self.capacidad() * self.marca().graduacion() * 0.01
 }
 
