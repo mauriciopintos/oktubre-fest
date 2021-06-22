@@ -1,6 +1,7 @@
 class Marca {
 	var property lupulo
 	var property origen
+	const property precioPorLitro
 	method graduacion()
 }
 

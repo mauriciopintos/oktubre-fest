@@ -40,7 +40,12 @@ class Persona {
 	method carpasQueLeSirvieron() = self.jarrasCompradas().asSet().map( { j => j.servidaEn() } )
 	
 	method estaEntrandoEnElVicio() = (1..self.jarrasCompradas().size() -1).all( { i => self.jarraEsAlMenosComoAnterior(i)  } )
-	method jarraEsAlMenosComoAnterior(indice) = self.jarrasCompradas().get(indice).capacidad() >= self.jarrasCompradas().get(indice -1).capacidad()
+
+	method jarraEsAlMenosComoAnterior(indice) {
+		return self.jarrasCompradas().get(indice).capacidad() >= self.jarrasCompradas().get(indice -1).capacidad()
+	}
+	
+	method gastoTotal() = self.jarrasCompradas().sum( { j => j.precio() } )
 }
 
 class Belga inherits Persona {
